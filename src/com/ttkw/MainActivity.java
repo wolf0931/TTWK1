@@ -3,17 +3,25 @@ package com.ttkw;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.ServiceConnection;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.Menu;
+import android.view.Window;
 
+import com.ttkw.Utils.bitmapUtils;
 import com.ttkw.service.ServiceToken;
 
 public class MainActivity extends Activity implements ServiceConnection {
 	private ServiceToken token;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		if (!bitmapUtils.isTablet(this))
+			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		//可以用来表示一个进程正在运行
+		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);    
 		setContentView(R.layout.mainactivity);
 	}
 
