@@ -7,19 +7,29 @@
     <uses-sdk
         android:minSdkVersion="8"
         android:targetSdkVersion="18" />
-
+    <!-- allowTaskReparenting用来标记Activity能否从启动的Task移动到taskAffinity指定的Task -->
+    <!-- 在manifest中设置了largeHeap=true之后，可以使用的最大内存值。 -->
     <application
         android:allowBackup="true"
+        android:allowTaskReparenting="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:largeHeap="true"
+        android:process=":main"
+        android:taskAffinity="ttkw.task.music" >
         <activity
-            android:name="com.ttkw.MainactivityActivity"
-            android:label="@string/app_name" >
+            android:name="com.ttkw.MainActivity"
+            android:label="@string/app_name"
+            android:logo="@drawable/ic_launcher"
+            android:windowSoftInputMode="adjustPan"
+             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
+                <action android:name="android.intent.action.MUSIC_PLAYER"/>
+				
+                <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.APP_MUSIC"/>
             </intent-filter>
         </activity>
     </application>

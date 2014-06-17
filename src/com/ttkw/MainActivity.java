@@ -1,15 +1,46 @@
 package com.ttkw;
 
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.view.Menu;
 
-public class MainActivity extends Activity {
+import com.ttkw.service.ServiceToken;
 
+public class MainActivity extends Activity implements ServiceConnection {
+	private ServiceToken token;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.mainactivity);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * android.content.ServiceConnection#onServiceConnected(android.content.
+	 * ComponentName, android.os.IBinder)
+	 */
+	@Override
+	public void onServiceConnected(ComponentName name, IBinder service) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * android.content.ServiceConnection#onServiceDisconnected(android.content
+	 * .ComponentName)
+	 */
+	@Override
+	public void onServiceDisconnected(ComponentName name) {
+		// TODO Auto-generated method stub
+
 	}
 
 	@Override
@@ -18,5 +49,4 @@ public class MainActivity extends Activity {
 		getMenuInflater().inflate(R.menu.mainactivity, menu);
 		return true;
 	}
-
 }
