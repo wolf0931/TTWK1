@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-      <!-- A transparent black -->
+    <!-- A transparent black -->
     <color name="transparent_black">#aa000000</color>
     
     <!-- selected tab text -->
@@ -24,4 +24,5 @@
 
     <!-- Quick Queue line seperator -->
     <color name="queue_callout_line">#99ffffff</color>
+
 </resources>
