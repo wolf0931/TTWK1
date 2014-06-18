@@ -89,8 +89,7 @@ public class GetBitmapTask extends AsyncTask<String, Integer, Bitmap> {
 				bitmap = BitmapFactory.decodeResource(mContextReference.get()
 						.getResources(), R.drawable.no_art_small);
 			else if (mImageInfo.size.equals(Constants.SIZE_NORMAL))
-				bitmap = BitmapFactory.decodeResource(mContextReference.get()
-						.getResources(), R.drawable.no_art_normal);
+				bitmap = BitmapFactory.decodeResource(mContextReference.get().getResources(), R.drawable.no_art_normal);
 		}
 		if (bitmap != null && !isCancelled()) {
 			if (listener != null) {
