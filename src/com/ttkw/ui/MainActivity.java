@@ -20,9 +20,8 @@ public class MainActivity extends Activity implements ServiceConnection {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		if (!bitmapUtils.isTablet(this))
-			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-		//可以用来表示一个进程正在运行
-		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);    
+		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.mainactivity);
 	}
 
