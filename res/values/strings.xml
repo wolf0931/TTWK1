@@ -5,6 +5,18 @@
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
     
+      <!-- ContextMenu items -->
+    <string name="play_all">Play all</string>
+    <string name="add_to_playlist">Add to playlist</string>
+    <string name="use_as_ringtone">Use as ringtone</string>
+    <string name="delete_playlist">Delete playlist</string>
+    <string name="search">Search</string>
+    <string name="remove">Remove from playlist</string>
+    <string name="image_edit_gallery">New image from gallery</string>
+    <string name="image_edit_file">Original image from file</string>
+    <string name="image_edit_lastfm">Fetch image from last.fm</string>
+    <string name="image_edit_web">Search the web for an image</string>
+    
     <!--actionbar imageview imagebutton  contentDescription -->
     <string name="cd_favorite">Make this a favorite song</string>
     <string name="cd_search">Search through your music</string>
@@ -60,5 +72,7 @@
     <string name="widget_style_summary">Choose the widget design</string>
     <string name="widget_style_dark">Holo Dark</string>
     <string name="widget_style_light">Holo Light</string>
+    
+    
     
 </resources>
