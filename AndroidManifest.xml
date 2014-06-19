@@ -49,7 +49,11 @@
                 <category android:name="android.intent.category.APP_MUSIC" />
             </intent-filter>
         </activity>
-
+ 		<!-- Settings 设置-->
+        <activity
+            android:name="com.ttkw.ui.SettingsHolder"
+        	android:logo="@drawable/ic_launcher"
+            android:label="@string/settings" />
         <!-- Now Playing -->
         <activity
             android:name=".ui.AudioPlayerHolder"

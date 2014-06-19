@@ -41,8 +41,9 @@
     <string name="tab_playlists">Playlists</string>
     <string name="tab_genres">Genres</string>
     <!-- Options MenuItems -->
-    <string name="settings">Settings</string>
-    <string name="shuffle_all">Shuffle all</string>
+    <string name="settings">设置</string>
+    <string name="shuffle_all">全部随机播放</string>
+    <string name="eqalizer">均衡器</string>
     <string name="share">Share</string>
     <string name="play_store">Play Store</string>
 
@@ -59,7 +60,6 @@
 
     <!-- Settings -->
     <string name="about">About Apollo</string>
-    <string name="eqalizer">Equalizer</string>
     <string name="header_interface">Interface</string>
     <string name="settings_storage_category">Storage</string>
     <string name="themes">Themes</string>
@@ -78,4 +78,17 @@
     <string name="widget_style_dark">Holo Dark</string>
     <string name="widget_style_light">Holo Light</string>
 
+        <!-- Settings keys -->
+    <string name="key_themes" translatable="false">themepreview</string>
+    <string name="key_themes_package" translatable="false">themePackageName</string>
+    <string name="key_themes_preferences" translatable="false">themePrefences</string>
+    <string name="key_build_version" translatable="false">build_version</string>
+    <string name="key_tabs_enabled" translatable="false">tabs_enabled</string>
+    <string name="key_visualization_type" translatable="false">visualization_type</string>
+    <string name="key_widget_style" translatable="false">widget_type</string>
+    
+    <!-- Theme layout Buttons -->
+    <string name="apply_theme">Apply theme</string>
+    <string name="get_more_themes">Get more themes</string>
+    
 </resources>
