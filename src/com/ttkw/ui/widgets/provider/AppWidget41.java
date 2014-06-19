@@ -30,7 +30,7 @@ import android.widget.RemoteViews;
 
 import com.ttkw.R;
 import com.ttkw.ui.AudioPlayerHolder;
-import com.ttkw.ui.MusicLibrary;
+import com.ttkw.ui.MainActivity;
 import com.ttkw.ui.config.Constants;
 import com.ttkw.ui.service.TService;
 
@@ -183,7 +183,7 @@ public class AppWidget41 extends AppWidgetProvider {
             views.setOnClickPendingIntent(R.id.four_by_one_album_appwidget, pendingIntent);
             views.setOnClickPendingIntent(R.id.four_by_one_albumart, pendingIntent);
         } else {
-            intent = new Intent(context, MusicLibrary.class);
+            intent = new Intent(context, MainActivity.class);
             pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
             views.setOnClickPendingIntent(R.id.four_by_one_album_appwidget, pendingIntent);
             views.setOnClickPendingIntent(R.id.four_by_one_albumart, pendingIntent);
