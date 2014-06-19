@@ -67,6 +67,52 @@
             android:noHistory="true"
             android:theme="@style/Theme.QuickQueue"
             android:windowSoftInputMode="stateUnchanged" />
+        
+         <!-- 1x1 App Widget -->
+        <receiver
+            android:name=".ui.widgets.provider.AppWidget11"
+            android:label="@string/apollo_1x1" >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/appwidget1x1_info" />
+        </receiver>
+        <!-- 4x1 App Widget -->
+        <receiver
+            android:name=".ui.widgets.provider.AppWidget41"
+            android:label="@string/apollo_4x1" >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/appwidget4x1_info" />
+        </receiver>
+        <!-- 4x2 App Widget -->
+        <receiver
+            android:name=".ui.widgets.provider.AppWidget42"
+            android:label="@string/apollo_4x2" >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/appwidget4x2_info" />
+        </receiver>
+        
+          <!-- Media button receiver -->
+        <receiver android:name="com.ttkw.ui.service.MediaButtonIntentReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+                <action android:name="android.media.AUDIO_BECOMING_NOISY" />
+            </intent-filter>
+        </receiver>
+        
     </application>
 
 </manifest>

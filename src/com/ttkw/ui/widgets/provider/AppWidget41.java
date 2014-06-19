@@ -29,10 +29,10 @@ import android.view.View;
 import android.widget.RemoteViews;
 
 import com.ttkw.R;
-import com.ttkw.config.Constants;
-import com.ttkw.service.TService;
 import com.ttkw.ui.AudioPlayerHolder;
 import com.ttkw.ui.MusicLibrary;
+import com.ttkw.ui.config.Constants;
+import com.ttkw.ui.service.TService;
 
 /**
  * Simple widget to show currently playing album art along with play/pause and
