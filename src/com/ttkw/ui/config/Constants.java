@@ -29,4 +29,9 @@ public final class Constants {
     
     // Storage Volume
     public final static String EXTERNAL = "external";
+    
+    // Playlists
+    public final static long PLAYLIST_UNKNOWN = -1, PLAYLIST_ALL_SONGS = -2, PLAYLIST_QUEUE = -3,
+            PLAYLIST_NEW = -4, PLAYLIST_FAVORITES = -5, PLAYLIST_RECENTLY_ADDED = -6;
+    
 }

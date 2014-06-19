@@ -4,8 +4,8 @@
     <string name="app_name">TTKW</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
-    
-      <!-- ContextMenu items -->
+
+    <!-- ContextMenu items -->
     <string name="play_all">Play all</string>
     <string name="add_to_playlist">Add to playlist</string>
     <string name="use_as_ringtone">Use as ringtone</string>
@@ -16,8 +16,8 @@
     <string name="image_edit_file">Original image from file</string>
     <string name="image_edit_lastfm">Fetch image from last.fm</string>
     <string name="image_edit_web">Search the web for an image</string>
-    
-    <!--actionbar imageview imagebutton  contentDescription -->
+
+    <!-- actionbar imageview imagebutton  contentDescription -->
     <string name="cd_favorite">Make this a favorite song</string>
     <string name="cd_search">Search through your music</string>
     <string name="cd_overflow">View more options</string>
@@ -28,11 +28,11 @@
     <string name="cd_next">Skip forwards</string>
     <string name="cd_shuffle">Shuffle tracks</string>
 
-     <!-- AudioPlayer title -->
+    <!-- AudioPlayer title -->
     <string name="nowplaying">正在播放</string>
-	<!-- Unknown genre name -->
+    <!-- Unknown genre name -->
     <string name="unknown">Unknown</string>
-    
+
     <!-- Tabs -->
     <string name="tab_recent">Recent</string>
     <string name="tab_artists">Artists</string>
@@ -40,19 +40,24 @@
     <string name="tab_songs">Songs</string>
     <string name="tab_playlists">Playlists</string>
     <string name="tab_genres">Genres</string>
-    
+    <!-- Options MenuItems -->
+    <string name="settings">Settings</string>
+    <string name="shuffle_all">Shuffle all</string>
+    <string name="share">Share</string>
+    <string name="play_store">Play Store</string>
+
     <!-- Visualizations -->
     <string name="visual_none">None</string>
     <string name="visual_bargraph">Bar Graph</string>
     <string name="visual_solidbargraph">Solid Bar Graph</string>
     <string name="visual_waveform">Waveform</string>
-    
-     <!-- App Widgets -->
+
+    <!-- App Widgets -->
     <string name="apollo_1x1">Apollo (1x1)</string>
     <string name="apollo_4x1">Apollo (4x1)</string>
     <string name="apollo_4x2">Apollo (4x2)</string>
-    
-      <!-- Settings -->
+
+    <!-- Settings -->
     <string name="about">About Apollo</string>
     <string name="eqalizer">Equalizer</string>
     <string name="header_interface">Interface</string>
@@ -68,11 +73,9 @@
     <string name="delete_warning">This will permanently delete the cached image entries</string>
     <string name="visualizer_title">Audio visualizer</string>
     <string name="visualizer_summary">Choose to display audio visualizations during playback</string>
-	<string name="widget_style_title">Widget Style</string>
+    <string name="widget_style_title">Widget Style</string>
     <string name="widget_style_summary">Choose the widget design</string>
     <string name="widget_style_dark">Holo Dark</string>
     <string name="widget_style_light">Holo Light</string>
-    
-    
-    
+
 </resources>
