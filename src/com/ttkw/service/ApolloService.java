@@ -70,13 +70,13 @@ import com.ttkw.R;
 import com.ttkw.Utils.ImageUtils;
 import com.ttkw.Utils.MusicUtils;
 import com.ttkw.Utils.VisualizerUtils;
-import com.ttkw.appwidgetprovider.AppWidget11;
-import com.ttkw.appwidgetprovider.AppWidget41;
-import com.ttkw.appwidgetprovider.AppWidget42;
 import com.ttkw.asyntask.GetBitmapTask;
 import com.ttkw.cache.ImageInfo;
 import com.ttkw.config.Constants;
 import com.ttkw.preferences.SharedPreferencesCompat;
+import com.ttkw.ui.widgets.provider.AppWidget11;
+import com.ttkw.ui.widgets.provider.AppWidget41;
+import com.ttkw.ui.widgets.provider.AppWidget42;
 
 public class ApolloService extends Service implements GetBitmapTask.OnBitmapReadyListener {
     /**

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.ttkw.appwidgetprovider;
+package com.ttkw.ui.widgets.provider;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
