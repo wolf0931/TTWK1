@@ -8,6 +8,7 @@ import java.util.Locale;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -24,9 +25,13 @@ import android.provider.MediaStore.Audio;
 import android.provider.MediaStore.Audio.AlbumColumns;
 import android.provider.MediaStore.Audio.ArtistColumns;
 import android.provider.MediaStore.Audio.AudioColumns;
+import android.provider.MediaStore.Audio.Genres;
 import android.provider.MediaStore.Audio.GenresColumns;
 import android.provider.MediaStore.Audio.Playlists;
 import android.provider.MediaStore.Audio.PlaylistsColumns;
+import android.provider.MediaStore.MediaColumns;
+import android.provider.Settings;
+import android.widget.Toast;
 
 import com.ttkw.R;
 import com.ttkw.ui.config.Constants;
@@ -38,7 +43,8 @@ import com.ttkw.ui.service.TtkwService;
 public class MusicUtils {
 	private final static StringBuilder sFormatBuilder = new StringBuilder();
 
-	private final static Formatter sFormatter = new Formatter(sFormatBuilder,Locale.getDefault());
+	private final static Formatter sFormatter = new Formatter(sFormatBuilder,
+			Locale.getDefault());
 
 	public static TtkwService mService = null;
 	private static HashMap<Context, ServiceBinder> sConnectionMap = new HashMap<Context, ServiceBinder>();
@@ -354,393 +360,549 @@ public class MusicUtils {
 		}
 		return null;
 	}
-	
-    /**
-     * @param token
-     */
-    public static void unbindFromService(ServiceToken token) {
-        if (token == null) {
-            return;
-        }
-        ContextWrapper cw = token.mWrappedContext;
-        ServiceBinder sb = sConnectionMap.remove(cw);
-        if (sb == null) {
-            return;
-        }
-        cw.unbindService(sb);
-        if (sConnectionMap.isEmpty()) {
-            mService = null;
-        }
-    }
 
-    /**
-     * @param context
-     * @param cursor
-     */
-    public static void shuffleAll(Context context, Cursor cursor) {
-        playAll(context, cursor, 0, true);
-    }
-    
-    /**
-     * @param context
-     * @param cursor
-     * @param position
-     * @param force_shuffle
-     */
-    private static void playAll(Context context, Cursor cursor, int position, boolean force_shuffle) {
+	/**
+	 * @param token
+	 */
+	public static void unbindFromService(ServiceToken token) {
+		if (token == null) {
+			return;
+		}
+		ContextWrapper cw = token.mWrappedContext;
+		ServiceBinder sb = sConnectionMap.remove(cw);
+		if (sb == null) {
+			return;
+		}
+		cw.unbindService(sb);
+		if (sConnectionMap.isEmpty()) {
+			mService = null;
+		}
+	}
 
-        long[] list = getSongListForCursor(cursor);
-        playAll(context, list, position, force_shuffle);
-    }
-    /**
-     * @param context
-     * @param list
-     * @param position
-     * @param force_shuffle
-     */
-    private static void playAll(Context context, long[] list, int position, boolean force_shuffle) {
-        if (list.length == 0 || mService == null) {
-            return;
-        }
-        try {
-            if (force_shuffle) {
-                mService.setShuffleMode(TService.SHUFFLE_NORMAL);
-            }
-            long curid = mService.getAudioId();
-            int curpos = mService.getQueuePosition();
-            if (position != -1 && curpos == position && curid == list[position]) {
-                // The selected file is the file that's currently playing;
-                // figure out if we need to restart with a new playlist,
-                // or just launch the playback activity.
-                long[] playlist = mService.getQueue();
-                if (Arrays.equals(list, playlist)) {
-                    // we don't need to set a new list, but we should resume
-                    // playback if needed
-                    mService.play();
-                    return;
-                }
-            }
-            if (position < 0) {
-                position = 0;
-            }
-            mService.open(list, force_shuffle ? -1 : position);
-            mService.play();
-        } catch (RemoteException ex) {
-            ex.printStackTrace();
-        }
-    }
-    
-    /**
-     * @param cursor
-     * @return
-     */
-    public static long[] getSongListForCursor(Cursor cursor) {
-        if (cursor == null) {
-            return sEmptyList;
-        }
-        int len = cursor.getCount();
-        long[] list = new long[len];
-        cursor.moveToFirst();
-        int colidx = -1;
-        try {
-            colidx = cursor.getColumnIndexOrThrow(Audio.Playlists.Members.AUDIO_ID);
-        } catch (IllegalArgumentException ex) {
-            colidx = cursor.getColumnIndexOrThrow(BaseColumns._ID);
-        }
-        for (int i = 0; i < len; i++) {
-            list[i] = cursor.getLong(colidx);
-            cursor.moveToNext();
-        }
-        return list;
-    }
-    
-    public static void notifyWidgets(String what){ 
-        try {
-        	mService.notifyChange(what);
-        } catch (Exception e) {
-        }
-    }
-    
-    /**
-     * @param index
-     */
-    public static void setQueuePosition(int index) {
-        if (mService == null)
-            return;
-        try {
-            mService.setQueuePosition(index);
-        } catch (RemoteException e) {
-        }
-    }
-    
-    /**
-     * @param context
-     * @param cursor
-     * @param position
-     */
-    public static void playAll(Context context, Cursor cursor, int position) {
-        playAll(context, cursor, position, false);
-    }
-    
-    /**
-     * @param context
-     * @param name
-     * @param def
-     * @return number of weeks used to create the Recent tab
-     */
-    public static int getIntPref(Context context, String name, int def) {
-        SharedPreferences prefs = context.getSharedPreferences(context.getPackageName(),
-                Context.MODE_PRIVATE);
-        return prefs.getInt(name, def);
-    }
-    /**
-     * @param context
-     * @param numalbums
-     * @param numsongs
-     * @param isUnknown
-     * @return a string based on the number of albums for an artist or songs for
-     *         an album
-     */
-    public static String makeAlbumsLabel(Context mContext, int numalbums, int numsongs,
-            boolean isUnknown) {
+	/**
+	 * @param context
+	 * @param cursor
+	 */
+	public static void shuffleAll(Context context, Cursor cursor) {
+		playAll(context, cursor, 0, true);
+	}
 
-        StringBuilder songs_albums = new StringBuilder();
+	/**
+	 * @param context
+	 * @param cursor
+	 * @param position
+	 * @param force_shuffle
+	 */
+	private static void playAll(Context context, Cursor cursor, int position,
+			boolean force_shuffle) {
 
-        Resources r = mContext.getResources();
-        if (isUnknown) {
-            String f = r.getQuantityText(R.plurals.Nsongs, numsongs).toString();
-            sFormatBuilder.setLength(0);
-            sFormatter.format(f, Integer.valueOf(numsongs));
-            songs_albums.append(sFormatBuilder);
-        } else {
-            String f = r.getQuantityText(R.plurals.Nalbums, numalbums).toString();
-            sFormatBuilder.setLength(0);
-            sFormatter.format(f, Integer.valueOf(numalbums));
-            songs_albums.append(sFormatBuilder);
-            songs_albums.append("\n");
-        }
-        return songs_albums.toString();
-    }
-    
-    /**
-     * @return current artist ID
-     */
-    public static long getCurrentArtistId() {
+		long[] list = getSongListForCursor(cursor);
+		playAll(context, list, position, force_shuffle);
+	}
 
-        if (MusicUtils.mService != null) {
-            try {
-                return mService.getArtistId();
-            } catch (RemoteException ex) {
-            }
-        }
-        return -1;
-    }
-    
-    /**
-     * @param context
-     * @param id
-     * @return
-     */
-    public static long[] getSongListForArtist(Context context, long id) {
-        final String[] projection = new String[] {
-            BaseColumns._ID
-        };
-        String selection = AudioColumns.ARTIST_ID + "=" + id + " AND " + AudioColumns.IS_MUSIC
-                + "=1";
-        String sortOrder = AudioColumns.ALBUM_KEY + "," + AudioColumns.TRACK;
-        Uri uri = Audio.Media.EXTERNAL_CONTENT_URI;
-        Cursor cursor = query(context, uri, projection, selection, null, sortOrder);
-        if (cursor != null) {
-            long[] list = getSongListForCursor(cursor);
-            cursor.close();
-            return list;
-        }
-        return sEmptyList;
-    }
-    /**
-     * @param context
-     * @param id
-     * @return
-     */
-    public static long[] getSongListForAlbum(Context context, long id) {
-        final String[] projection = new String[] {
-            BaseColumns._ID
-        };
-        String selection = AudioColumns.ALBUM_ID + "=" + id + " AND " + AudioColumns.IS_MUSIC
-                + "=1";
-        String sortOrder = AudioColumns.TRACK;
-        Uri uri = Audio.Media.EXTERNAL_CONTENT_URI;
-        Cursor cursor = query(context, uri, projection, selection, null, sortOrder);
-        if (cursor != null) {
-            long[] list = getSongListForCursor(cursor);
-            cursor.close();
-            return list;
-        }
-        return sEmptyList;
-    }
-    /**
-     * @param context
-     * @param list
-     * @param position
-     */
-    public static void playAll(Context context, long[] list, int position) {
-        playAll(context, list, position, false);
-    }
-    
-    /**
-     * Create a Search Chooser
-     */
-    public static void doSearch(Context mContext, Cursor mCursor, int index) {
-        CharSequence title = null;
-        Intent i = new Intent();
-        i.setAction(MediaStore.INTENT_ACTION_MEDIA_SEARCH);
-        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        String query = mCursor.getString(index);
-        title = "";
-        i.putExtra("", query);
-        title = title + " " + query;
-        title = "Search " + title;
-        i.putExtra(SearchManager.QUERY, query);
-        mContext.startActivity(Intent.createChooser(i, title));
-    }
-    
-    /**
-     * @param mContext
-     * @param genre_id
-     * @param default_name
-     * @return genre name
-     */
-    public static String getGenreName(Context mContext, long genre_id, boolean default_name) {
-        String where = BaseColumns._ID + "=" + genre_id;
-        String[] cols = new String[] {
-            GenresColumns.NAME
-        };
-        Uri uri = Audio.Genres.EXTERNAL_CONTENT_URI;
-        Cursor cursor = mContext.getContentResolver().query(uri, cols, where, null, null);
-        if (cursor == null){
-            return MediaStore.UNKNOWN_STRING;
-        }
-        if (cursor.getCount() <= 0) {
-            if (default_name)
-                return mContext.getString(R.string.unknown);
-            else
-                return MediaStore.UNKNOWN_STRING;
-        } else {
-            cursor.moveToFirst();
-            String name = cursor.getString(0);
-            cursor.close();
-            if (name == null || MediaStore.UNKNOWN_STRING.equals(name)) {
-                if (default_name)
-                    return mContext.getString(R.string.unknown);
-                else
-                    return MediaStore.UNKNOWN_STRING;
-            }
-            return name;
-        }
-    }
-    
-    /**
-     * @param playlist_id
-     * @return playlist name
-     */
-    public static String getPlaylistName(Context mContext, long playlist_id) {
-        String where = BaseColumns._ID + "=" + playlist_id;
-        String[] cols = new String[] {
-            PlaylistsColumns.NAME
-        };
-        Uri uri = Audio.Playlists.EXTERNAL_CONTENT_URI;
-        Cursor cursor = mContext.getContentResolver().query(uri, cols, where, null, null);
-        if (cursor == null){
-            return "";
-        }
-        if (cursor.getCount() <= 0)
-            return "";
-        cursor.moveToFirst();
-        String name = cursor.getString(0);
-        cursor.close();
-        return name;
-    }
-    public static String getArtistName(Context mContext, long artist_id, boolean default_name) {
-        String where = BaseColumns._ID + "=" + artist_id;
-        String[] cols = new String[] {
-            ArtistColumns.ARTIST
-        };
-        Uri uri = Audio.Artists.EXTERNAL_CONTENT_URI;
-        Cursor cursor = mContext.getContentResolver().query(uri, cols, where, null, null);
-        if (cursor == null){
-            return MediaStore.UNKNOWN_STRING;
-        }
-        if (cursor.getCount() <= 0) {
-            if (default_name)
-                return mContext.getString(R.string.unknown);
-            else
-                return MediaStore.UNKNOWN_STRING;
-        } else {
-            cursor.moveToFirst();
-            String name = cursor.getString(0);
-            cursor.close();
-            if (name == null || MediaStore.UNKNOWN_STRING.equals(name)) {
-                if (default_name)
-                    return mContext.getString(R.string.unknown);
-                else
-                    return MediaStore.UNKNOWN_STRING;
-            }
-            return name;
-        }
-    }
-    /**
-     * @param mContext
-     * @param album_id
-     * @param default_name
-     * @return album name
-     */
-    public static String getAlbumName(Context mContext, long album_id, boolean default_name) {
-        String where = BaseColumns._ID + "=" + album_id;
-        String[] cols = new String[] {
-            AlbumColumns.ALBUM
-        };
-        Uri uri = Audio.Albums.EXTERNAL_CONTENT_URI;
-        Cursor cursor = mContext.getContentResolver().query(uri, cols, where, null, null);
-        if (cursor == null){
-            return MediaStore.UNKNOWN_STRING;
-        }
-        if (cursor.getCount() <= 0) {
-            if (default_name)
-                return mContext.getString(R.string.unknown);
-            else
-                return MediaStore.UNKNOWN_STRING;
-        } else {
-            cursor.moveToFirst();
-            String name = cursor.getString(0);
-            cursor.close();
-            if (name == null || MediaStore.UNKNOWN_STRING.equals(name)) {
-                if (default_name)
-                    return mContext.getString(R.string.unknown);
-                else
-                    return MediaStore.UNKNOWN_STRING;
-            }
-            return name;
-        }
-    }
-    
-    /**
-     * @param genre
-     * @return parsed genre name
-     */
-    public static String parseGenreName(Context mContext, String genre) {
-        int genre_id = -1;
+	/**
+	 * @param context
+	 * @param list
+	 * @param position
+	 * @param force_shuffle
+	 */
+	private static void playAll(Context context, long[] list, int position,
+			boolean force_shuffle) {
+		if (list.length == 0 || mService == null) {
+			return;
+		}
+		try {
+			if (force_shuffle) {
+				mService.setShuffleMode(TService.SHUFFLE_NORMAL);
+			}
+			long curid = mService.getAudioId();
+			int curpos = mService.getQueuePosition();
+			if (position != -1 && curpos == position && curid == list[position]) {
+				// The selected file is the file that's currently playing;
+				// figure out if we need to restart with a new playlist,
+				// or just launch the playback activity.
+				long[] playlist = mService.getQueue();
+				if (Arrays.equals(list, playlist)) {
+					// we don't need to set a new list, but we should resume
+					// playback if needed
+					mService.play();
+					return;
+				}
+			}
+			if (position < 0) {
+				position = 0;
+			}
+			mService.open(list, force_shuffle ? -1 : position);
+			mService.play();
+		} catch (RemoteException ex) {
+			ex.printStackTrace();
+		}
+	}
 
-        if (genre == null || genre.trim().length() <= 0)
-            return mContext.getResources().getString(R.string.unknown);
+	/**
+	 * @param cursor
+	 * @return
+	 */
+	public static long[] getSongListForCursor(Cursor cursor) {
+		if (cursor == null) {
+			return sEmptyList;
+		}
+		int len = cursor.getCount();
+		long[] list = new long[len];
+		cursor.moveToFirst();
+		int colidx = -1;
+		try {
+			colidx = cursor
+					.getColumnIndexOrThrow(Audio.Playlists.Members.AUDIO_ID);
+		} catch (IllegalArgumentException ex) {
+			colidx = cursor.getColumnIndexOrThrow(BaseColumns._ID);
+		}
+		for (int i = 0; i < len; i++) {
+			list[i] = cursor.getLong(colidx);
+			cursor.moveToNext();
+		}
+		return list;
+	}
 
-        try {
-            genre_id = Integer.parseInt(genre);
-        } catch (NumberFormatException e) {
-            return genre;
-        }
-        if (genre_id >= 0 && genre_id < Constants.GENRES_DB.length)
-            return Constants.GENRES_DB[genre_id];
-        else
-            return mContext.getResources().getString(R.string.unknown);
-    }
+	public static void notifyWidgets(String what) {
+		try {
+			mService.notifyChange(what);
+		} catch (Exception e) {
+		}
+	}
+
+	/**
+	 * @param index
+	 */
+	public static void setQueuePosition(int index) {
+		if (mService == null)
+			return;
+		try {
+			mService.setQueuePosition(index);
+		} catch (RemoteException e) {
+		}
+	}
+
+	/**
+	 * @param context
+	 * @param cursor
+	 * @param position
+	 */
+	public static void playAll(Context context, Cursor cursor, int position) {
+		playAll(context, cursor, position, false);
+	}
+
+	/**
+	 * @param context
+	 * @param name
+	 * @param def
+	 * @return number of weeks used to create the Recent tab
+	 */
+	public static int getIntPref(Context context, String name, int def) {
+		SharedPreferences prefs = context.getSharedPreferences(
+				context.getPackageName(), Context.MODE_PRIVATE);
+		return prefs.getInt(name, def);
+	}
+
+	/**
+	 * @param context
+	 * @param numalbums
+	 * @param numsongs
+	 * @param isUnknown
+	 * @return a string based on the number of albums for an artist or songs for
+	 *         an album
+	 */
+	public static String makeAlbumsLabel(Context mContext, int numalbums,
+			int numsongs, boolean isUnknown) {
+
+		StringBuilder songs_albums = new StringBuilder();
+
+		Resources r = mContext.getResources();
+		if (isUnknown) {
+			String f = r.getQuantityText(R.plurals.Nsongs, numsongs).toString();
+			sFormatBuilder.setLength(0);
+			sFormatter.format(f, Integer.valueOf(numsongs));
+			songs_albums.append(sFormatBuilder);
+		} else {
+			String f = r.getQuantityText(R.plurals.Nalbums, numalbums)
+					.toString();
+			sFormatBuilder.setLength(0);
+			sFormatter.format(f, Integer.valueOf(numalbums));
+			songs_albums.append(sFormatBuilder);
+			songs_albums.append("\n");
+		}
+		return songs_albums.toString();
+	}
+
+	/**
+	 * @return current artist ID
+	 */
+	public static long getCurrentArtistId() {
+
+		if (MusicUtils.mService != null) {
+			try {
+				return mService.getArtistId();
+			} catch (RemoteException ex) {
+			}
+		}
+		return -1;
+	}
+
+	/**
+	 * @param context
+	 * @param id
+	 * @return
+	 */
+	public static long[] getSongListForArtist(Context context, long id) {
+		final String[] projection = new String[] { BaseColumns._ID };
+		String selection = AudioColumns.ARTIST_ID + "=" + id + " AND "
+				+ AudioColumns.IS_MUSIC + "=1";
+		String sortOrder = AudioColumns.ALBUM_KEY + "," + AudioColumns.TRACK;
+		Uri uri = Audio.Media.EXTERNAL_CONTENT_URI;
+		Cursor cursor = query(context, uri, projection, selection, null,
+				sortOrder);
+		if (cursor != null) {
+			long[] list = getSongListForCursor(cursor);
+			cursor.close();
+			return list;
+		}
+		return sEmptyList;
+	}
+
+	/**
+	 * @param context
+	 * @param id
+	 * @return
+	 */
+	public static long[] getSongListForAlbum(Context context, long id) {
+		final String[] projection = new String[] { BaseColumns._ID };
+		String selection = AudioColumns.ALBUM_ID + "=" + id + " AND "
+				+ AudioColumns.IS_MUSIC + "=1";
+		String sortOrder = AudioColumns.TRACK;
+		Uri uri = Audio.Media.EXTERNAL_CONTENT_URI;
+		Cursor cursor = query(context, uri, projection, selection, null,
+				sortOrder);
+		if (cursor != null) {
+			long[] list = getSongListForCursor(cursor);
+			cursor.close();
+			return list;
+		}
+		return sEmptyList;
+	}
+
+	/**
+	 * @param context
+	 * @param list
+	 * @param position
+	 */
+	public static void playAll(Context context, long[] list, int position) {
+		playAll(context, list, position, false);
+	}
+
+	/**
+	 * Create a Search Chooser
+	 */
+	public static void doSearch(Context mContext, Cursor mCursor, int index) {
+		CharSequence title = null;
+		Intent i = new Intent();
+		i.setAction(MediaStore.INTENT_ACTION_MEDIA_SEARCH);
+		i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		String query = mCursor.getString(index);
+		title = "";
+		i.putExtra("", query);
+		title = title + " " + query;
+		title = "Search " + title;
+		i.putExtra(SearchManager.QUERY, query);
+		mContext.startActivity(Intent.createChooser(i, title));
+	}
+
+	/**
+	 * @param mContext
+	 * @param genre_id
+	 * @param default_name
+	 * @return genre name
+	 */
+	public static String getGenreName(Context mContext, long genre_id,
+			boolean default_name) {
+		String where = BaseColumns._ID + "=" + genre_id;
+		String[] cols = new String[] { GenresColumns.NAME };
+		Uri uri = Audio.Genres.EXTERNAL_CONTENT_URI;
+		Cursor cursor = mContext.getContentResolver().query(uri, cols, where,
+				null, null);
+		if (cursor == null) {
+			return MediaStore.UNKNOWN_STRING;
+		}
+		if (cursor.getCount() <= 0) {
+			if (default_name)
+				return mContext.getString(R.string.unknown);
+			else
+				return MediaStore.UNKNOWN_STRING;
+		} else {
+			cursor.moveToFirst();
+			String name = cursor.getString(0);
+			cursor.close();
+			if (name == null || MediaStore.UNKNOWN_STRING.equals(name)) {
+				if (default_name)
+					return mContext.getString(R.string.unknown);
+				else
+					return MediaStore.UNKNOWN_STRING;
+			}
+			return name;
+		}
+	}
+
+	/**
+	 * @param playlist_id
+	 * @return playlist name
+	 */
+	public static String getPlaylistName(Context mContext, long playlist_id) {
+		String where = BaseColumns._ID + "=" + playlist_id;
+		String[] cols = new String[] { PlaylistsColumns.NAME };
+		Uri uri = Audio.Playlists.EXTERNAL_CONTENT_URI;
+		Cursor cursor = mContext.getContentResolver().query(uri, cols, where,
+				null, null);
+		if (cursor == null) {
+			return "";
+		}
+		if (cursor.getCount() <= 0)
+			return "";
+		cursor.moveToFirst();
+		String name = cursor.getString(0);
+		cursor.close();
+		return name;
+	}
+
+	public static String getArtistName(Context mContext, long artist_id,
+			boolean default_name) {
+		String where = BaseColumns._ID + "=" + artist_id;
+		String[] cols = new String[] { ArtistColumns.ARTIST };
+		Uri uri = Audio.Artists.EXTERNAL_CONTENT_URI;
+		Cursor cursor = mContext.getContentResolver().query(uri, cols, where,
+				null, null);
+		if (cursor == null) {
+			return MediaStore.UNKNOWN_STRING;
+		}
+		if (cursor.getCount() <= 0) {
+			if (default_name)
+				return mContext.getString(R.string.unknown);
+			else
+				return MediaStore.UNKNOWN_STRING;
+		} else {
+			cursor.moveToFirst();
+			String name = cursor.getString(0);
+			cursor.close();
+			if (name == null || MediaStore.UNKNOWN_STRING.equals(name)) {
+				if (default_name)
+					return mContext.getString(R.string.unknown);
+				else
+					return MediaStore.UNKNOWN_STRING;
+			}
+			return name;
+		}
+	}
+
+	/**
+	 * @param mContext
+	 * @param album_id
+	 * @param default_name
+	 * @return album name
+	 */
+	public static String getAlbumName(Context mContext, long album_id,
+			boolean default_name) {
+		String where = BaseColumns._ID + "=" + album_id;
+		String[] cols = new String[] { AlbumColumns.ALBUM };
+		Uri uri = Audio.Albums.EXTERNAL_CONTENT_URI;
+		Cursor cursor = mContext.getContentResolver().query(uri, cols, where,
+				null, null);
+		if (cursor == null) {
+			return MediaStore.UNKNOWN_STRING;
+		}
+		if (cursor.getCount() <= 0) {
+			if (default_name)
+				return mContext.getString(R.string.unknown);
+			else
+				return MediaStore.UNKNOWN_STRING;
+		} else {
+			cursor.moveToFirst();
+			String name = cursor.getString(0);
+			cursor.close();
+			if (name == null || MediaStore.UNKNOWN_STRING.equals(name)) {
+				if (default_name)
+					return mContext.getString(R.string.unknown);
+				else
+					return MediaStore.UNKNOWN_STRING;
+			}
+			return name;
+		}
+	}
+
+	/**
+	 * @param genre
+	 * @return parsed genre name
+	 */
+	public static String parseGenreName(Context mContext, String genre) {
+		int genre_id = -1;
+
+		if (genre == null || genre.trim().length() <= 0)
+			return mContext.getResources().getString(R.string.unknown);
+
+		try {
+			genre_id = Integer.parseInt(genre);
+		} catch (NumberFormatException e) {
+			return genre;
+		}
+		if (genre_id >= 0 && genre_id < Constants.GENRES_DB.length)
+			return Constants.GENRES_DB[genre_id];
+		else
+			return mContext.getResources().getString(R.string.unknown);
+	}
+
+	/*
+	 * @param context
+	 * 
+	 * @return
+	 */
+	public static long getFavoritesId(Context context) {
+		long favorites_id = -1;
+		String favorites_where = PlaylistsColumns.NAME + "='" + "Favorites"
+				+ "'";
+		String[] favorites_cols = new String[] { BaseColumns._ID };
+		Uri favorites_uri = Audio.Playlists.EXTERNAL_CONTENT_URI;
+		Cursor cursor = query(context, favorites_uri, favorites_cols,
+				favorites_where, null, null);
+		if (cursor.getCount() <= 0) {
+			favorites_id = createPlaylist(context, "Favorites");
+		} else {
+			cursor.moveToFirst();
+			favorites_id = cursor.getLong(0);
+			cursor.close();
+		}
+		return favorites_id;
+	}
+
+	/**
+	 * @param context
+	 * @param id
+	 */
+	public static void setRingtone(Context context, long id) {
+		ContentResolver resolver = context.getContentResolver();
+		// Set the flag in the database to mark this as a ringtone
+		Uri ringUri = ContentUris.withAppendedId(
+				Audio.Media.EXTERNAL_CONTENT_URI, id);
+		try {
+			ContentValues values = new ContentValues(2);
+			values.put(AudioColumns.IS_RINGTONE, "1");
+			values.put(AudioColumns.IS_ALARM, "1");
+			resolver.update(ringUri, values, null, null);
+		} catch (UnsupportedOperationException ex) {
+			// most likely the card just got unmounted
+			return;
+		}
+
+		String[] cols = new String[] { BaseColumns._ID, MediaColumns.DATA,
+				MediaColumns.TITLE };
+
+		String where = BaseColumns._ID + "=" + id;
+		Cursor cursor = query(context, Audio.Media.EXTERNAL_CONTENT_URI, cols,
+				where, null, null);
+		try {
+			if (cursor != null && cursor.getCount() == 1) {
+				// Set the system setting to make this the current ringtone
+				cursor.moveToFirst();
+				Settings.System.putString(resolver, Settings.System.RINGTONE,
+						ringUri.toString());
+				String message = context.getString(R.string.set_as_ringtone,
+						cursor.getString(2));
+				Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+			}
+		} finally {
+			if (cursor != null) {
+				cursor.close();
+			}
+		}
+	}
+
+	/**
+	 * @return current track's queue position
+	 */
+	public static int getQueuePosition() {
+		if (mService == null)
+			return 0;
+		try {
+			return mService.getQueuePosition();
+		} catch (RemoteException e) {
+		}
+		return 0;
+	}
+
+	/**
+	 * @param id
+	 * @return removes track from a playlist
+	 */
+	public static int removeTrack(long id) {
+		if (mService == null)
+			return 0;
+
+		try {
+			return mService.removeTrack(id);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+
+	/**
+	 * @return
+	 */
+	public static long[] getQueue() {
+
+		if (mService == null)
+			return sEmptyList;
+
+		try {
+			return mService.getQueue();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		return sEmptyList;
+	}
+
+	/**
+	 * @param context
+	 * @param id
+	 * @return
+	 */
+	public static long[] getSongListForPlaylist(Context context, long id) {
+		final String[] projection = new String[] { Audio.Playlists.Members.AUDIO_ID };
+		String sortOrder = Playlists.Members.DEFAULT_SORT_ORDER;
+		Uri uri = Playlists.Members.getContentUri(Constants.EXTERNAL, id);
+		Cursor cursor = query(context, uri, projection, null, null, sortOrder);
+		if (cursor != null) {
+			long[] list = getSongListForCursor(cursor);
+			cursor.close();
+			return list;
+		}
+		return sEmptyList;
+	}
+
+	/**
+	 * @param context
+	 * @param id
+	 * @return
+	 */
+	public static long[] getSongListForGenre(Context context, long id) {
+		String[] projection = new String[] { BaseColumns._ID };
+		StringBuilder selection = new StringBuilder();
+		selection.append(AudioColumns.IS_MUSIC + "=1");
+		selection.append(" AND " + MediaColumns.TITLE + "!=''");
+		Uri uri = Genres.Members.getContentUri(Constants.EXTERNAL, id);
+		Cursor cursor = context.getContentResolver().query(uri, projection,
+				selection.toString(), null, null);
+		if (cursor != null) {
+			long[] list = getSongListForCursor(cursor);
+			cursor.close();
+			return list;
+		}
+		return sEmptyList;
+	}
 }
