@@ -6,7 +6,7 @@
     <com.ttkw.ui.widgets.ScrollableTabView
         android:id="@+id/scrollingTabs"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/tab_height" />
+        android:layout_height="30dp" />
 
     <android.support.v4.view.ViewPager
         android:id="@+id/viewPager"
@@ -17,7 +17,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:baselineAligned="false"
-        android:layout_height="@dimen/bottom_action_bar_height"
+        android:layout_height="48dp"
         android:layout_alignParentBottom="true" >
 
         <fragment
