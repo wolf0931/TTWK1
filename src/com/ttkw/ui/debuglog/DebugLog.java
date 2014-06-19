@@ -1,4 +1,4 @@
-package com.ttwk.ui.debuglog;
+package com.ttkw.ui.debuglog;
 
 import android.util.Log;
 
