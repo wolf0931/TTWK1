@@ -21,6 +21,12 @@ public final class Constants {
 			SRC_FIRST_AVAILABLE = "first_avail", SRC_LASTFM = "last_fm",
 			SRC_FILE = "from_file", SRC_GALLERY = "from_gallery",
 			SIZE_NORMAL = "normal", SIZE_THUMB = "thumb";
+	 // Bundle & Intent type
+    public final static String MIME_TYPE = "mimetype", INTENT_ACTION = "action", DATA_SCHEME = "file";
+	
 	// Theme item type
     public final static int THEME_ITEM_BACKGROUND = 0, THEME_ITEM_FOREGROUND = 1;
+    
+    // Storage Volume
+    public final static String EXTERNAL = "external";
 }
