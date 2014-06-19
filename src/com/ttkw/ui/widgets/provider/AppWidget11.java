@@ -12,7 +12,7 @@ import android.view.View;
 import android.widget.RemoteViews;
 
 import com.ttkw.R;
-import com.ttkw.service.ApolloService;
+import com.ttkw.service.TService;
 
 /**
  * Simple widget to show currently playing album art along with play/pause and
@@ -38,8 +38,8 @@ public class AppWidget11 extends AppWidgetProvider {
 
         // Send broadcast intent to any running ApolloService so it can
         // wrap around with an immediate update.
-        Intent updateIntent = new Intent(ApolloService.SERVICECMD);
-        updateIntent.putExtra(ApolloService.CMDNAME, AppWidget11.CMDAPPWIDGETUPDATE);
+        Intent updateIntent = new Intent(TService.SERVICECMD);
+        updateIntent.putExtra(TService.CMDNAME, AppWidget11.CMDAPPWIDGETUPDATE);
         updateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds);
         updateIntent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY);
         context.sendBroadcast(updateIntent);
@@ -82,12 +82,12 @@ public class AppWidget11 extends AppWidgetProvider {
     }
 
     /**
-     * Handle a change notification coming over from {@link ApolloService}
+     * Handle a change notification coming over from {@link TService}
      */
-    public void notifyChange(ApolloService service, String what) {
+    public void notifyChange(TService service, String what) {
         if (hasInstances(service)) {
-            if (ApolloService.META_CHANGED.equals(what)
-                    || ApolloService.PLAYSTATE_CHANGED.equals(what)) {
+            if (TService.META_CHANGED.equals(what)
+                    || TService.PLAYSTATE_CHANGED.equals(what)) {
                 performUpdate(service, null);
             }
         }
@@ -96,7 +96,7 @@ public class AppWidget11 extends AppWidgetProvider {
     /**
      * Update all active widget instances by pushing changes
      */
-    public void performUpdate(ApolloService service, int[] appWidgetIds) {
+    public void performUpdate(TService service, int[] appWidgetIds) {
         final RemoteViews views = new RemoteViews(service.getPackageName(),
                 R.layout.onebyone_app_widget);
 
@@ -136,9 +136,9 @@ public class AppWidget11 extends AppWidgetProvider {
         Intent intent;
         PendingIntent pendingIntent;
 
-        final ComponentName serviceName = new ComponentName(context, ApolloService.class);
+        final ComponentName serviceName = new ComponentName(context, TService.class);
 
-        intent = new Intent(ApolloService.TOGGLEPAUSE_ACTION);
+        intent = new Intent(TService.TOGGLEPAUSE_ACTION);
         intent.setComponent(serviceName);
         pendingIntent = PendingIntent.getService(context, 0, intent, 0);
         views.setOnClickPendingIntent(R.id.one_by_one_albumart, pendingIntent);

@@ -61,9 +61,9 @@ public class MediaButtonIntentReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         String intentAction = intent.getAction();
         if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intentAction)) {
-            Intent i = new Intent(context, ApolloService.class);
-            i.setAction(ApolloService.SERVICECMD);
-            i.putExtra(ApolloService.CMDNAME, ApolloService.CMDPAUSE);
+            Intent i = new Intent(context, TService.class);
+            i.setAction(TService.SERVICECMD);
+            i.putExtra(TService.CMDNAME, TService.CMDPAUSE);
             context.startService(i);
         } else if (Intent.ACTION_MEDIA_BUTTON.equals(intentAction)) {
             KeyEvent event = (KeyEvent)intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
@@ -75,7 +75,7 @@ public class MediaButtonIntentReceiver extends BroadcastReceiver {
             int keycode = event.getKeyCode();
             int action = event.getAction();
             long eventtime = event.getEventTime();
-            int buttonId = intent.getIntExtra(ApolloService.CMDNOTIF, 0);
+            int buttonId = intent.getIntExtra(TService.CMDNOTIF, 0);
 
             // single quick press: pause/resume.
             // double press: next track
@@ -84,30 +84,30 @@ public class MediaButtonIntentReceiver extends BroadcastReceiver {
             String command = null;
             switch (keycode) {
                 case KeyEvent.KEYCODE_MEDIA_STOP:
-                    command = ApolloService.CMDSTOP;
+                    command = TService.CMDSTOP;
                     break;
                 case KeyEvent.KEYCODE_HEADSETHOOK:
                 case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
-                    command = ApolloService.CMDTOGGLEPAUSE;
+                    command = TService.CMDTOGGLEPAUSE;
                     break;
                 case KeyEvent.KEYCODE_MEDIA_NEXT:
-                    command = ApolloService.CMDNEXT;
+                    command = TService.CMDNEXT;
                     break;
                 case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
-                    command = ApolloService.CMDPREVIOUS;
+                    command = TService.CMDPREVIOUS;
                     break;
                 case KeyEvent.KEYCODE_MEDIA_PAUSE:
-                    command = ApolloService.CMDPAUSE;
+                    command = TService.CMDPAUSE;
                     break;
                 case KeyEvent.KEYCODE_MEDIA_PLAY:
-                    command = ApolloService.CMDPLAY;
+                    command = TService.CMDPLAY;
                     break;
             }
 
             if (command != null) {
                 if (action == KeyEvent.ACTION_DOWN) {
                     if (mDown && (buttonId == 0)) {
-                        if ((ApolloService.CMDTOGGLEPAUSE.equals(command) || ApolloService.CMDPLAY
+                        if ((TService.CMDTOGGLEPAUSE.equals(command) || TService.CMDPLAY
                                 .equals(command))
                                 && mLastClickTime != 0
                                 && eventtime - mLastClickTime > LONG_PRESS_DELAY) {
@@ -126,16 +126,16 @@ public class MediaButtonIntentReceiver extends BroadcastReceiver {
                         // The service may or may not be running, but we need to
                         // send it
                         // a command.
-                        Intent i = new Intent(context, ApolloService.class);
-                        i.setAction(ApolloService.SERVICECMD);
-                        i.putExtra(ApolloService.CMDNOTIF, buttonId);
+                        Intent i = new Intent(context, TService.class);
+                        i.setAction(TService.SERVICECMD);
+                        i.putExtra(TService.CMDNOTIF, buttonId);
                         if (keycode == KeyEvent.KEYCODE_HEADSETHOOK
                                 && eventtime - mLastClickTime < 300) {
-                            i.putExtra(ApolloService.CMDNAME, ApolloService.CMDNEXT);
+                            i.putExtra(TService.CMDNAME, TService.CMDNEXT);
                             context.startService(i);
                             mLastClickTime = 0;
                         } else {
-                            i.putExtra(ApolloService.CMDNAME, command);
+                            i.putExtra(TService.CMDNAME, command);
                             context.startService(i);
                             mLastClickTime = eventtime;
                         }

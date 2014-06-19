@@ -78,7 +78,7 @@ import com.ttkw.ui.widgets.provider.AppWidget11;
 import com.ttkw.ui.widgets.provider.AppWidget41;
 import com.ttkw.ui.widgets.provider.AppWidget42;
 
-public class ApolloService extends Service implements GetBitmapTask.OnBitmapReadyListener {
+public class TService extends Service implements GetBitmapTask.OnBitmapReadyListener {
     /**
      * used to specify whether enqueue() should start playing the new list of
      * files right away, next or once all the currently queued files have been
@@ -411,13 +411,13 @@ public class ApolloService extends Service implements GetBitmapTask.OnBitmapRead
                 toggleShuffle();
             } else if (AppWidget42.CMDAPPWIDGETUPDATE.equals(cmd)) {
                 int[] appWidgetIds = intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS);
-                mAppWidgetProvider4x2.performUpdate(ApolloService.this, appWidgetIds);
+                mAppWidgetProvider4x2.performUpdate(TService.this, appWidgetIds);
             } else if (AppWidget41.CMDAPPWIDGETUPDATE.equals(cmd)) {
                 int[] appWidgetIds = intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS);
-                mAppWidgetProvider4x1.performUpdate(ApolloService.this, appWidgetIds);
+                mAppWidgetProvider4x1.performUpdate(TService.this, appWidgetIds);
             } else if (AppWidget11.CMDAPPWIDGETUPDATE.equals(cmd)) {
                 int[] appWidgetIds = intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS);
-                mAppWidgetProvider1x1.performUpdate(ApolloService.this, appWidgetIds);
+                mAppWidgetProvider1x1.performUpdate(TService.this, appWidgetIds);
             }
         }
     };
@@ -429,7 +429,7 @@ public class ApolloService extends Service implements GetBitmapTask.OnBitmapRead
         }
     };
 
-    public ApolloService() {
+    public TService() {
     }
 
     @SuppressLint({ "WorldWriteableFiles", "WorldReadableFiles" })
@@ -896,7 +896,7 @@ public class ApolloService extends Service implements GetBitmapTask.OnBitmapRead
                         closeExternalStorageFiles(intent.getData().getPath());
                     } else if (action.equals(Intent.ACTION_MEDIA_MOUNTED)) {
                         mMediaMountedCount++;
-                        mCardId = MusicUtils.getCardId(ApolloService.this);
+                        mCardId = MusicUtils.getCardId(TService.this);
                         reloadQueue();
                         mQueueIsSaveable = true;
                         notifyChange(QUEUE_CHANGED);
@@ -2191,7 +2191,7 @@ public class ApolloService extends Service implements GetBitmapTask.OnBitmapRead
         private boolean mIsInitialized = false;
 
         public MultiPlayer() {
-            mCurrentMediaPlayer.setWakeMode(ApolloService.this, PowerManager.PARTIAL_WAKE_LOCK);
+            mCurrentMediaPlayer.setWakeMode(TService.this, PowerManager.PARTIAL_WAKE_LOCK);
         }
 
         public void setDataSource(String path) {
@@ -2206,7 +2206,7 @@ public class ApolloService extends Service implements GetBitmapTask.OnBitmapRead
                 player.reset();
                 player.setOnPreparedListener(null);
                 if (path.startsWith("content://")) {
-                    player.setDataSource(ApolloService.this, Uri.parse(path));
+                    player.setDataSource(TService.this, Uri.parse(path));
                 } else {
                     player.setDataSource(path);
                 }
@@ -2238,7 +2238,7 @@ public class ApolloService extends Service implements GetBitmapTask.OnBitmapRead
                 return;
             }
             mNextMediaPlayer = new MediaPlayer();
-            mNextMediaPlayer.setWakeMode(ApolloService.this, PowerManager.PARTIAL_WAKE_LOCK);
+            mNextMediaPlayer.setWakeMode(TService.this, PowerManager.PARTIAL_WAKE_LOCK);
             mNextMediaPlayer.setAudioSessionId(getAudioSessionId());
             if (setDataSourceImpl(mNextMediaPlayer, path)) {
                 mCurrentMediaPlayer.setNextMediaPlayer(mNextMediaPlayer);
@@ -2316,7 +2316,7 @@ public class ApolloService extends Service implements GetBitmapTask.OnBitmapRead
                         // service is still being restarted
                         mCurrentMediaPlayer = new MediaPlayer();
                         mCurrentMediaPlayer
-                                .setWakeMode(ApolloService.this, PowerManager.PARTIAL_WAKE_LOCK);
+                                .setWakeMode(TService.this, PowerManager.PARTIAL_WAKE_LOCK);
                         mHandler.sendMessageDelayed(mHandler.obtainMessage(SERVER_DIED), 2000);
                         return true;
                     default:
@@ -2359,10 +2359,10 @@ public class ApolloService extends Service implements GetBitmapTask.OnBitmapRead
      * a remote reference to the stub.
      */
     static class ServiceStub extends TtkwService.Stub {
-        WeakReference<ApolloService> mService;
+        WeakReference<TService> mService;
 
-        ServiceStub(ApolloService service) {
-            mService = new WeakReference<ApolloService>(service);
+        ServiceStub(TService service) {
+            mService = new WeakReference<TService>(service);
         }
 
         @Override
