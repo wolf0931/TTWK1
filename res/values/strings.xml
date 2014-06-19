@@ -68,8 +68,8 @@
     <string name="version">Apollo Version</string>
     <string name="tab_visibility_title">Tab visibility</string>
     <string name="tab_visibility_summary">Choose which tabs are displayed</string>
-    <string name="settings_delete_cache_title">Delete cache</string>
-    <string name="settings_delete_cache_summary">Remove all cached images</string>
+    <string name="settings_delete_cache_title">清除缓存</string>
+    <string name="settings_delete_cache_summary">清除所以图片缓存</string>
     <string name="delete_warning">This will permanently delete the cached image entries</string>
     <string name="visualizer_title">Audio visualizer</string>
     <string name="visualizer_summary">Choose to display audio visualizations during playback</string>
