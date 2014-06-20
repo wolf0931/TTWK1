@@ -905,4 +905,88 @@ public class MusicUtils {
 		}
 		return sEmptyList;
 	}
+	
+	 /**
+     * @param context
+     * @param ids
+     * @param playlistid
+     */
+    public static void addToPlaylist(Context context, long[] ids, long playlistid) {
+
+        if (ids == null) {
+        } else {
+            int size = ids.length;
+            ContentResolver resolver = context.getContentResolver();
+            // need to determine the number of items currently in the playlist,
+            // so the play_order field can be maintained.
+            String[] cols = new String[] {
+                "count(*)"
+            };
+            Uri uri = Audio.Playlists.Members.getContentUri(Constants.EXTERNAL, playlistid);
+            Cursor cur = resolver.query(uri, cols, null, null, null);
+            cur.moveToFirst();
+            int base = cur.getInt(0);
+            cur.close();
+            int numinserted = 0;
+            for (int i = 0; i < size; i += 1000) {
+                makeInsertItems(ids, i, 1000, base);
+                numinserted += resolver.bulkInsert(uri, sContentValuesCache);
+            }
+            String message = context.getResources().getQuantityString(
+                    R.plurals.NNNtrackstoplaylist, numinserted, numinserted);
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+        }
+    }
+    /**
+     * @param ids
+     * @param offset
+     * @param len
+     * @param base
+     */
+    private static void makeInsertItems(long[] ids, int offset, int len, int base) {
+
+        // adjust 'len' if would extend beyond the end of the source array
+        if (offset + len > ids.length) {
+            len = ids.length - offset;
+        }
+        // allocate the ContentValues array, or reallocate if it is the wrong
+        // size
+        if (sContentValuesCache == null || sContentValuesCache.length != len) {
+            sContentValuesCache = new ContentValues[len];
+        }
+        // fill in the ContentValues array with the right values for this pass
+        for (int i = 0; i < len; i++) {
+            if (sContentValuesCache[i] == null) {
+                sContentValuesCache[i] = new ContentValues();
+            }
+
+            sContentValuesCache[i].put(Playlists.Members.PLAY_ORDER, base + offset + i);
+            sContentValuesCache[i].put(Playlists.Members.AUDIO_ID, ids[offset + i]);
+        }
+    }
+    /**
+     * @param context
+     * @param secs
+     * @return time String
+     */
+    public static String makeTimeString(Context context, long secs) {
+
+        String durationformat = context.getString(secs < 3600 ? R.string.durationformatshort
+                : R.string.durationformatlong);
+
+        /*
+         * Provide multiple arguments so the format can be changed easily by
+         * modifying the xml.
+         */
+        sFormatBuilder.setLength(0);
+
+        final Object[] timeArgs = sTimeArgs;
+        timeArgs[0] = secs / 3600;
+        timeArgs[1] = secs / 60;
+        timeArgs[2] = secs / 60 % 60;
+        timeArgs[3] = secs;
+        timeArgs[4] = secs % 60;
+
+        return sFormatter.format(durationformat, timeArgs).toString();
+    }
 }

@@ -116,8 +116,7 @@ OnItemClickListener {
 
         // Align the track list with the header, in other words,OCD.
         TextView mHeader = (TextView)root.findViewById(R.id.title);
-        int eight = (int)getActivity().getResources().getDimension(
-                R.dimen.list_separator_padding_left_right);
+        int eight = (int)getActivity().getResources().getDimension(R.dimen.list_separator_padding_left_right);
         mHeader.setPadding(eight, 0, 0, 0);
 
         // Set the header while in @TracksBrowser
